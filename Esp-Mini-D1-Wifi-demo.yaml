@@ -1,4 +1,5 @@
 # ESP-HOME  Mini D1 Wifi Info
+# Detailed information about pins, and setup for ESP8266 D1-MINI-WIFI with ESPHOME to Home assistant
 # 
 # WARNING: If connecting LEDs, ALWAYS USE RESISTORS! 
 #      - GPIO4 and GPIO5 are the most safe to use GPIOs if you want to operate relays.
@@ -78,4 +79,3 @@
 #     - Wakes up device from deep sleep.
 #     - Can be used as INPUT but has no PWM or I2C support
 #     - ! HIGH at boot
-
