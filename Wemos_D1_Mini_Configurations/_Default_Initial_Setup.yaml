@@ -132,11 +132,11 @@ switch:
     inverted: true
     restore_mode: ALWAYS_OFF # Ensures relay stays off after power cycle, other options include ALWAYS_ON, RESTORE_DEFAULT_OFF, and RESTORE_DEFAULT_ON
 
-  # Relay 4 on GPIO15 [D8] (pin must not be pulled low at boot)
+  # Relay 4 on GPIO12 [D6]
   - platform: gpio
-    pin: GPIO15
-    name: "[D8] Relay 4" # Can be unstable? MUST NEVER BE PULLED LOW AT BOOT
-    id: d8
+    pin: GPIO12
+    name: "[D6] Relay 4"
+    id: d6
     inverted: true
     restore_mode: ALWAYS_OFF # Ensures relay stays off after power cycle, other options include ALWAYS_ON, RESTORE_DEFAULT_OFF, and RESTORE_DEFAULT_ON
 
@@ -156,12 +156,12 @@ binary_sensor:
   # General-purpose binary input on GPIO12
   - platform: gpio
     pin:
-      number: GPIO12
+      number: GPIO16
       mode:
         input: true
         pullup: true # Use the pull-up resistor on this pin
       inverted: true
-    name: "[D6] General binary input"
+    name: "[D0] General binary input"
 
   # Monitor the device’s connection status
   - platform: status
