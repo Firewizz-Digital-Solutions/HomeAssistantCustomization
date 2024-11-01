@@ -1,0 +1,81 @@
+# ESP-HOME  Mini D1 Wifi Info
+# Detailed information about pins, and setup for ESP8266 D1-MINI-WIFI with ESPHOME to Home assistant
+# 
+# WARNING: If connecting LEDs, ALWAYS USE RESISTORS! 
+#      - GPIO4 and GPIO5 are the most safe to use GPIOs if you want to operate relays.
+#
+# Ports and functions explained
+#
+# General Purpose IOs work in 3 stage, HIGH, LOW NEUTRAL
+# HIGH (when connected to 3.3v) or give 3.3v when used as OUTPUT
+# LOW (when connected to ground)
+# Neutral Nothing connected
+#
+# (The ESP8266 supports interrupts in any GPIO, except GPIO16)
+# 
+# PWM (ESP8266 allows software PWM in all I/O pins): 
+#     - Most GPIO pins can also be configured for PWM (Pulse Width Modulation) for applications like LED dimming or motor control. Additionally, these pins can be configured to trigger interrupts on changing signals, useful for reactive or time-sensitive applications.
+#
+# EXAMPLE:
+# output:
+#   - platform: esp8266_pwm
+#     pin: D1
+#     frequency: 1000 Hz
+#     id: pwm_output
+# This configuration sets a GPIO pin (D1) to output a PWM signal at a frequency of 1kHz
+#
+#
+# I2C (Inter Integrated Circuit): 
+# - I2C is a serial communication protocol that allows multiple slave devices (like sensors, displays) to be controlled by a master device (like your ESP8266) over a single bus (two wires: SDA for data, and SCL for clock). It's used for connecting low-speed peripherals to processors and microcontrollers.
+#
+#
+#
+# [pull-up] Has pull-up resistor returning neutral state to HIGH
+# [pull-down] Hass pull-down resistor returning neutral state to LOW
+#
+# [RST] Reset
+#     - pulling this LOW reset(restarts) the controller, This is the same as pressing the on-board RESET button
+# [ADC0-A0] "Analog INPUT": 
+#     - This pin can read analog voltages from 0 to 3.3V and provides a 10-bit resolution.
+#     - Use as INPUT
+# [GPIO0-D3] "FLASH" (pull-up): 
+#     - If LOW when boot, it goes in flash mode
+#     - When GPIO0 is pulled LOW, it sets the ESP8266 into bootloader mode. This is the same as pressing the on-board FLASH/BOOT button
+#     - Can be used as output but recommanded use is NATIVE(FLASH)
+#     - ! Boot fails if pulled LOW during boot
+# [GPIO1-TX] "TXD0" 
+#     - Used for serial communication (UART). TX sends data. Ideal for serial peripherals or debugging.
+#     - Can be used as output. Adviced to only use as NATIVE
+#     - ! HIGH at boot
+#     - ! debug output at boot, boot fails if pulled LOW
+# [GPIO2-D4] "Internal LED" (pull-up): 
+#     - Pulling this LOW turns on LED on print. (use this for output)
+#     - Can be used as OUTPUT, BUT IS HIGH AT BOOT!
+#     - ! boot fails if pulled LOW on boot
+# [GPIO3-RX] "RXD0" 
+#     - Used for serial communication (UART). receives data. Ideal for serial peripherals or debugging.
+#     - Can be used as INPUT. Adviced to only use as NATIVE
+#     - ! HIGH at boot
+# [GPIO4-D2] (I2C) "SDA" 
+#     - Typically used for I2C communication, with D2 as SDA (data).
+#     - Can be used freely as INPUT or OUTPUT (Adviced as preferred OUTPUT for relays)
+# [GPIO5-D1] (I2C) "SCL" 
+#     - Typically used for I2C communication, with D2 as SDA (data).
+#     - Can be used freely as INPUT or OUTPUT (Adviced as preferred OUTPUT for relays)
+# [GPIO12-D6] "MISO"  (Master In Slave Out)
+#     - Typically this is the line on which data travels from the peripheral device back to the master device
+#     - Can be used freely as INPUT or OUTPUT
+# [GPIO13-D7] "MOSI"  (Master Out Slave In)
+#     - Typically this line carries data from the master device to the peripheral.
+#     - Can be used freely as INPUT or OUTPUT
+# [GPIO14-D5] "SCK"  (Serial Clock)
+#     - Typically this line carries the clock signal from the master device, synchronizing data transmission.
+#     - Can be used freely as INPUT or OUTPUT
+# [GPIO15-D8] "CS"  (pull-down) Slave Select
+#     - Typically this pin is used by the master device to select which peripheral to communicate with when multiple devices are on the same SPI bus. Pulling this line LOW selects the device; pulling it HIGH deselects it
+#     - Can be used as OUTPUT. Adviced to only use as NATIVE
+#     - ! Boot fails if pulled HIGH
+# [GPIO15-D0] "WAKE"
+#     - Wakes up device from deep sleep.
+#     - Can be used as INPUT but has no PWM or I2C support
+#     - ! HIGH at boot
