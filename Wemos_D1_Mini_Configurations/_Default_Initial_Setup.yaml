@@ -30,6 +30,9 @@ wifi:
   ssid: "MyWifi"
   password: "MyWiFiPassword"
 
+  # Automatically reboot if Wi-Fi fails to reconnect after 10 minutes
+  reboot_timeout: 10min
+  
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: "controller-name"
