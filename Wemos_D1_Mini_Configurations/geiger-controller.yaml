@@ -1,0 +1,164 @@
+#esphome-web-4fec90
+esphome:
+  name: geiger-controller
+
+esp8266:
+  board: esp01_1m
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+  platform: esphome
+  password: "XXX"
+
+wifi:
+  ssid: "Firewizz.nl"
+  password: "XXX"
+
+  #manual_ip:
+  #  static_ip: 10.0.1.118
+  #  # Set this to the IP address of the router. Often ends with .1
+  #  gateway: 10.0.0.1
+  #  # The subnet of the network. 255.255.255.0 works for most home networks.
+  #  subnet: 255.255.0.0
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Esphome-Web-4Fec90"
+    password: "XXX"
+
+captive_portal:
+
+
+web_server:
+  port: 80
+  version: 3
+
+# Analog input
+sensor:
+  - platform: adc
+    pin: A0
+    name: "Analog Input Percentage"
+    update_interval: 60s
+    unit_of_measurement: "%"
+    accuracy_decimals: 2
+    filters:
+      - multiply: 100.0 # First, multiply the value to scale up to 100%
+      - lambda: return x / 1023.0; # Then, divide by the max ADC value to get a percentage
+  - platform: pulse_counter
+    pin:
+      number: GPIO5
+      mode:
+        input: true
+        pullup: true # Use the pull-up resistor on this pin
+    update_interval: 60s
+    name: "Pulse counter (p/min)"
+    filters:
+      - lambda: return x / 60.0;  # Example filter to adjust values if needed
+
+  - platform: pulse_counter
+    pin: 12
+    name: ${friendly_name}
+    id: "geiger_counter"
+    state_class: measurement
+    unit_of_measurement: 'CPM'
+    on_raw_value:
+      - sensor.template.publish:
+          id: radiation_level
+          state: !lambda 'return x / 123.14709;'
+ 
+  - platform: template
+    name: "Radiation Level"
+    id: "radiation_level"
+    unit_of_measurement: 'µSv/h'
+    icon: mdi:radioactive
+    accuracy_decimals: 5
+
+
+  - platform: wifi_signal
+    name: "ESP WiFi Signal Strength"
+    update_interval: 60s
+  - platform: uptime
+    name: "Uptime Seconds"
+    id: uptime_seconds 
+  - platform: template
+    name: "Uptime Days"
+    lambda: |-
+      return (id(uptime_seconds).state / 86400.0);
+    unit_of_measurement: "days"
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: "ESP IP Address"
+    bssid:
+      name: "ESP BSSID"
+
+status_led:
+  pin: GPIO2
+
+switch:
+#  - platform: gpio
+#    pin: GPIO5
+#    name: "Relay 1"
+#    id: d1
+#    restore_mode: ALWAYS_OFF #Other options include ALWAYS_ON, RESTORE_DEFAULT_OFF, and RESTORE_DEFAULT_ON
+#    inverted: true
+  - platform: gpio
+    pin: GPIO4
+    name: "Relay 2"
+    id: d2
+    restore_mode: ALWAYS_OFF
+    inverted: true
+#  - platform: gpio
+#    pin: GPIO2
+#    name: "Print LED" # use for print LED, if pulled low while boot, it causes boot problems
+#    id: d4
+#    inverted: true
+  - platform: gpio
+    pin: GPIO14
+    name: "Relay 3" # Can be unstable?
+    id: d5
+    inverted: true
+    restore_mode: ALWAYS_OFF
+  - platform: gpio
+    pin: GPIO15
+    name: "Relay 4" # Can be unstable? MUST NEVER BE PULLED LOW
+    id: d8
+    inverted: true
+    restore_mode: ALWAYS_OFF
+
+binary_sensor:
+  - platform: gpio
+    pin: GPIO13
+    name: "IN 1"
+    id: d1
+  - platform: gpio
+    pin: 
+      number: 00
+      mode:
+        input: true
+        pullup: true # Use the pull-up resistor on this pin
+      inverted: true
+    name: "FLASH BOOT Monitor" # Only monitor state, do not use the pin
+    id: d3
+  - platform: status
+    name: "ESP Device Status"
+
+
+interval:
+  # If disconnected for 5 minutes, close all valves
+  - interval: 300s
+    then:
+      - if:
+          condition:
+            - not:
+                api.connected:   # Correctly negated to check for disconnection
+          else:
+            - switch.turn_off: d2
+            - switch.turn_off: d5
+            - switch.turn_off: d8
